@@ -66,9 +66,9 @@ ErrorCode insertToFront(List* list, ListElem_t value, size_t index)
 
 ErrorCode insertToBack(List* list, ListElem_t value, size_t index)
 {
-    AssertSoft(0 <= index < list->size, INDEX_OUT_OF_RANGE);
-
     list->size += 1;
+
+    AssertSoft(0 <= index < list->size, INDEX_OUT_OF_RANGE);
 
     /* realloc check */
 
@@ -80,7 +80,7 @@ ErrorCode insertToBack(List* list, ListElem_t value, size_t index)
     list->data[index].prev = &list->data[list->freeHead];
 
     list->data[list->freeHead].next = &list->data[index];
-    list->data[list->freeHead].prev = &list->data[index];
+    list->data[list->freeHead].prev = tempNode;
 
     
     list->freeHead += 1;
@@ -111,11 +111,27 @@ ErrorCode pushBack(List* list, ListElem_t value)
 
 ErrorCode printList(List* list)
 {
-    Node* curNode = list->data;
-    for (size_t i = 0; i < list->size; i++)
-        printf("[%llu]: %d\n", i, curNode->value);
     
-    curNode = curNode->next;
+    printf("values stored physically:\n{\n");
+    
+    for (size_t i = 0; i < list->size; i++)
+    {
+        printf("\t[%llu]: %d\n", i, list->data[i].value);
+    }
+
+    printf("}\n\n");
+
+    Node* curNode = list->head->next;
+
+    printf("values stored with nodes:\n{\n");
+
+    for (size_t i = 0; i < list->size; i++)
+    {
+        printf("\t[%llu]: %d\n", i, curNode->value);
+        curNode = curNode->next;
+    }
+
+    printf("}\n");
 
     return OK;
 }

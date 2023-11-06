@@ -6,5 +6,7 @@ int main(int argc, char* argv[])
     createList(&list);
     pushBack(&list, 10);
     pushBack(&list, 20);
+    pushBack(&list, 30);
+    insertToBack(&list, 5, 2);
     printList(&list);
 }

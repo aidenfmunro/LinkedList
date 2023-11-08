@@ -66,9 +66,9 @@ ErrorCode insertToFront(List* list, ListElem_t value, size_t index)
 
 ErrorCode insertToBack(List* list, ListElem_t value, size_t index)
 {
-    list->size += 1;
-
     AssertSoft(0 <= index < list->size, INDEX_OUT_OF_RANGE);
+
+    list->size += 1;
 
     /* realloc check */
 
@@ -79,8 +79,8 @@ ErrorCode insertToBack(List* list, ListElem_t value, size_t index)
     tempNode->next         = &list->data[list->freeHead];
     list->data[index].prev = &list->data[list->freeHead];
 
-    list->data[list->freeHead].next = &list->data[index];
     list->data[list->freeHead].prev = tempNode;
+    list->data[list->freeHead].next = &list->data[index];
 
     
     list->freeHead += 1;
@@ -101,7 +101,7 @@ ErrorCode pushBack(List* list, ListElem_t value)
     list->data[list->freeHead].value = value;
 
     list->data[list->freeHead].prev = list->head;
-    list->data[list->freeHead].next = list->data;
+    list->data[list->freeHead].next = list->head->next;
 
     list->head->next = &list->data[list->freeHead];
     list->data->prev = &list->data[list->freeHead];
@@ -109,9 +109,14 @@ ErrorCode pushBack(List* list, ListElem_t value)
     list->freeHead += 1;
 }
 
+ErrorCode listVerify(List* list)
+{
+
+}
+
 ErrorCode printList(List* list)
 {
-    
+
     printf("values stored physically:\n{\n");
     
     for (size_t i = 0; i < list->size; i++)
@@ -135,5 +140,7 @@ ErrorCode printList(List* list)
 
     return OK;
 }
+
+
 
 

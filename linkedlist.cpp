@@ -85,6 +85,11 @@ ErrorCode insertAfter(List* list, size_t index, Elem_t value)
     return OK;
 }
 
+ErrorCode DeleteElem(List* list, size_t index)
+{
+
+}
+
 ErrorCode printList(List* list)
 {
     printf("physical address: \n");
@@ -102,6 +107,59 @@ ErrorCode printList(List* list)
         printf("[%llu] -> value: %d, next: %llu, prev %llu\n", curIndex, list->ptr[curIndex].value, list->ptr[curIndex].next, list->ptr[curIndex].prev);
         curIndex = list->ptr[curIndex].next;
     }
+}
+
+#define GRAPH_DUMP_FILENAME "GraphDump.dot"
+
+#define FONT_SIZE "10"
+
+#define FONT_NAME "helvetica"
+
+#define NODE_FRAME_COLOR "\"#fffdd0\""
+
+#define BACKGROUND_COLOR "\"#ffffff\""
+
+#define FREE_HEAD_COLOR "\"#b9e793\""
+
+#define NODE_COLOR "\"#fffdd0\""
+
+#define dumpGraph(filename, ...) fprintf(filename, __VA_ARGS__)
+
+ErrorCode DumpListGraph(List* list)
+{
+    myOpen(GRAPH_DUMP_FILENAME, "w", graphFile);
+
+    dumpGraph(graphFile,
+    "digraph\n"
+    "{\n"
+    "rankdir = LR;\n"
+    "node [shape = record, color = " NODE_FRAME_COLOR ", fontname = " FONT_NAME ", fontsize = " FONT_SIZE "];\n"
+    "bgcolor = " BACKGROUND_COLOR ";\n"
+    );
+
+    for (size_t i = 0; i < list->capacity; i++)
+    {
+        dumpGraph(graphFile,
+        "NODE_%zu[style = \"filled\", fillcolor = " NODE_COLOR ", "
+        "label = \"index = %d|value\\n%d|{prev = %d|next = %d}\"];\n",
+        i, i, list->ptr[i].value, list->ptr[i].prev, list->ptr[i].next
+        );
+    }
+
+    dumpGraph(graphFile, "NODE_0");
+
+    for (size_t i = 1; i < list->capacity; i++)
+    {
+        dumpGraph(graphFile, "->NODE_%zu", i);
+    }
+    
+    dumpGraph(graphFile, ";\n"
+    "}\n"
+    );
+
+    myClose(graphFile);
+
+    return OK;
 }
 
 

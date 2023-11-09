@@ -37,4 +37,6 @@ ErrorCode insertBefore(List* list, size_t index, Elem_t value);
 
 ErrorCode printList(List* list);
 
+ErrorCode DumpListGraph(List* list);
+
 #endif

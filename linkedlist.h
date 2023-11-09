@@ -41,5 +41,6 @@ ErrorCode PrintList(List* list);
 
 ErrorCode DumpListGraph(List* list);
 
+ErrorCode listVerify(List* list);
 
 #endif

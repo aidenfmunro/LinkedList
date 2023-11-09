@@ -63,13 +63,21 @@ ErrorCode InsertBefore(List* list, size_t index, Elem_t value)
     return InsertAfter(list, list->ptr[index].prev, value);
 }
 
+#define CHECK_VERIFICATION(list)    \
+    if (listVerify(list))           \
+    {                               \
+        return listVerify(list);    \
+    }
+
 ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 {
-    size_t newNext = list->ptr[index].next; // assign index of next elem in index;
+    CHECK_VERIFICATION(list);
 
-    size_t curFreeIndex = list->freeHead; // where the new elem is storred
+    size_t newNext = list->ptr[index].next; 
 
-    list->freeHead = list->ptr[curFreeIndex].next; //
+    size_t curFreeIndex = list->freeHead; 
+
+    list->freeHead = list->ptr[curFreeIndex].next; 
 
     list->ptr[curFreeIndex].value = value;
 
@@ -85,12 +93,16 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 
     /* realloc */
 
+    CHECK_VERIFICATION(list);
+
     return OK;
 }
 
+#undef CHECK_VERIFICATION
+
 ErrorCode Delete(List* list, size_t index)
 {
-
+    return OK;
 }
 
 ErrorCode PrintList(List* list)
@@ -99,17 +111,20 @@ ErrorCode PrintList(List* list)
 
     for (size_t i = 0; i < list->capacity; i++)
     {
-        printf("[%llu] -> value: %d, next: %llu, prev %llu\n", i, list->ptr[i].value, list->ptr[i].next, list->ptr[i].prev);
+        printf("[%lu] -> value: %d, next: %lu, prev %lu\n", i, list->ptr[i].value, list->ptr[i].next, list->ptr[i].prev);
     }
 
     printf("\nin order:\n");
+
     size_t curIndex = list->ptr[0].next;
 
     for (size_t i = 0; i < list->size; i++)
     {
-        printf("[%llu] -> value: %d, next: %llu, prev %llu\n", curIndex, list->ptr[curIndex].value, list->ptr[curIndex].next, list->ptr[curIndex].prev);
+        printf("[%lu] -> value: %d, next: %lu, prev %lu\n", curIndex, list->ptr[curIndex].value, list->ptr[curIndex].next, list->ptr[curIndex].prev);
         curIndex = list->ptr[curIndex].next;
     }
+
+    return OK;
 }
 
 #define CHECK_ERROR(EXPRESSION, ERROR)                  \
@@ -129,6 +144,8 @@ ErrorCode listVerify(List* list)
 
     return OK;
 }
+
+#undef CHECK_ERROR
 
 #define GRAPH_DUMP_FILENAME "GraphDump.dot"
 
@@ -162,7 +179,7 @@ ErrorCode DumpListGraph(List* list)
     {
         dumpGraph(graphFile,
         "NODE_%zu[style = \"filled\", fillcolor = " NODE_COLOR ", "
-        "label = \"index = %d|value\\n%d|{prev = %d|next = %d}\"];\n",
+        "label = \"index = %lu|value\\n%d|{prev = %lu|next = %lu}\"];\n",
         i, i, list->ptr[i].value, list->ptr[i].prev, list->ptr[i].next
         );
     }

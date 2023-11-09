@@ -19,10 +19,13 @@ enum ERRORS
     INDEX_OUT_OF_RANGE,
     HEAD_PREV_IS_NULL,
     TAIL_NEXT_IS_NULL,
-    UNABLE_TO_OPEN_FILE
+    UNABLE_TO_OPEN_FILE,
+    NULL_PTR,
+    LIST_OVERFLOW,
+    FREEHEAD_FUCKED_UP
 };
 
-ErrorCode createList(List* list)
+ErrorCode CreateList(List* list)
 {
     SafeCalloc(tempPtr, ListElem_t, DEFAULT_LIST_CAPACITY);
 
@@ -34,7 +37,7 @@ ErrorCode createList(List* list)
 
     for (size_t i = 0; i < DEFAULT_LIST_CAPACITY; i++)
     {
-        list->ptr[i] = {.value = POISON, .next = i + 1, .prev = FREE_ELEM};
+        list->ptr[i] = {.value = POISON, .next = i + 1, .prev = i - 1};
     }
 
     list->freeHead = 0;
@@ -45,22 +48,22 @@ ErrorCode createList(List* list)
     return OK;
 }
 
-ErrorCode pushFront(List* list, Elem_t value)
+ErrorCode PushFront(List* list, Elem_t value)
 {
-    return insertAfter(list, list->ptr[0].prev, value);
+    return InsertAfter(list, list->ptr[0].prev, value);
 }
 
-ErrorCode pushBack(List* list, Elem_t value)
+ErrorCode PushBack(List* list, Elem_t value)
 {
-    return insertAfter(list, list->ptr[list->size].next, value);
+    return InsertAfter(list, list->ptr[list->size].prev, value);
 }
 
-ErrorCode insertBefore(List* list, size_t index, Elem_t value)
+ErrorCode InsertBefore(List* list, size_t index, Elem_t value)
 {
-    return insertAfter(list, list->ptr[index].prev, value);
+    return InsertAfter(list, list->ptr[index].prev, value);
 }
 
-ErrorCode insertAfter(List* list, size_t index, Elem_t value)
+ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 {
     size_t newNext = list->ptr[index].next; // assign index of next elem in index;
 
@@ -85,12 +88,12 @@ ErrorCode insertAfter(List* list, size_t index, Elem_t value)
     return OK;
 }
 
-ErrorCode DeleteElem(List* list, size_t index)
+ErrorCode Delete(List* list, size_t index)
 {
 
 }
 
-ErrorCode printList(List* list)
+ErrorCode PrintList(List* list)
 {
     printf("physical address: \n");
 
@@ -107,6 +110,24 @@ ErrorCode printList(List* list)
         printf("[%llu] -> value: %d, next: %llu, prev %llu\n", curIndex, list->ptr[curIndex].value, list->ptr[curIndex].next, list->ptr[curIndex].prev);
         curIndex = list->ptr[curIndex].next;
     }
+}
+
+#define CHECK_ERROR(EXPRESSION, ERROR)                  \
+    if (EXPRESSION)                                     \
+    {                                                   \
+        return ERROR;                                   \
+    }                
+
+
+ErrorCode listVerify(List* list)
+{
+    CHECK_ERROR(!list, NULL_PTR);
+    CHECK_ERROR(!list->ptr, NULL_PTR);
+    CHECK_ERROR(list->size > list->capacity, LIST_OVERFLOW);
+    CHECK_ERROR(list->capacity > MAX_LIST_CAPACITY, LIST_OVERFLOW);
+    CHECK_ERROR(list->freeHead > list->capacity - 1, FREEHEAD_FUCKED_UP);
+
+    return OK;
 }
 
 #define GRAPH_DUMP_FILENAME "GraphDump.dot"

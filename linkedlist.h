@@ -25,18 +25,21 @@ struct List
     size_t freeHead;
 };
 
-ErrorCode createList(List* list);
+ErrorCode CreateList(List* list);
 
-ErrorCode pushFront(List* list, Elem_t value);
+ErrorCode PushFront(List* list, Elem_t value);
 
-ErrorCode pushBack(List* list, Elem_t value);
+ErrorCode PushBack(List* list, Elem_t value);
 
-ErrorCode insertAfter(List* list, size_t index, Elem_t value);
+ErrorCode InsertAfter(List* list, size_t index, Elem_t value);
 
-ErrorCode insertBefore(List* list, size_t index, Elem_t value);
+ErrorCode InsertBefore(List* list, size_t index, Elem_t value);
 
-ErrorCode printList(List* list);
+ErrorCode Delete(List* list, size_t index);
+
+ErrorCode PrintList(List* list);
 
 ErrorCode DumpListGraph(List* list);
+
 
 #endif

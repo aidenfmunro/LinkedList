@@ -6,35 +6,35 @@
 
 typedef int ErrorCode;
 
-typedef int ListElem_t;
+typedef int Elem_t; 
 
-struct Node
+struct ListElem_t
 {
-    ListElem_t value;
+    Elem_t value;
 
-    Node* next;
-    Node* prev;
+    size_t next;
+    size_t prev;
 };
 
 struct List
 {
-    Node* head;
+    ListElem_t* ptr;
 
-    Node* data;    
-
-    Node* tail;
-
-    int freeHead;
-
-    int capacity;
-    int size;
+    size_t size;
+    size_t capacity;
+    size_t freeHead;
 };
 
 ErrorCode createList(List* list);
-ErrorCode insertToFront(List* list, ListElem_t value, size_t index);
-ErrorCode insertToBack(List* list, ListElem_t value, size_t index);
-ErrorCode pushFront(List* list, ListElem_t value);
-ErrorCode pushBack(List* list, ListElem_t value);
+
+ErrorCode pushFront(List* list, Elem_t value);
+
+ErrorCode pushBack(List* list, Elem_t value);
+
+ErrorCode insertAfter(List* list, size_t index, Elem_t value);
+
+ErrorCode insertBefore(List* list, size_t index, Elem_t value);
+
 ErrorCode printList(List* list);
 
 #endif

@@ -2,144 +2,108 @@
 #include "utils.h"
 #include "linkedlist.h"
 
-const int FREE_ELEM = -1;
+const size_t FREE_ELEM = -1;
 
-const int DEFAULT_LIST_CAPACITY = 4;
+const Elem_t POISON = __INT64_MAX__;
 
-const int HEAD_AND_TAIL = 2;
+const int DEFAULT_LIST_CAPACITY = 8;
 
 const int MAX_LIST_CAPACITY = 1024;
 
-const ListElem_t FREE_HEAD = -1;
+const size_t FREE_HEAD = -1;
 
 enum ERRORS
 {   
     OK,
     NO_MEMORY_AVAILABLE,
-    INDEX_OUT_OF_RANGE
+    INDEX_OUT_OF_RANGE,
+    HEAD_PREV_IS_NULL,
+    TAIL_NEXT_IS_NULL,
+    UNABLE_TO_OPEN_FILE
 };
 
 ErrorCode createList(List* list)
 {
-    SafeCalloc(list->head, Node, DEFAULT_LIST_CAPACITY + HEAD_AND_TAIL);
+    SafeCalloc(tempPtr, ListElem_t, DEFAULT_LIST_CAPACITY);
 
-    list->data = &list->head[1];
+    list->ptr = tempPtr;
 
-    list->tail = &list->data[DEFAULT_LIST_CAPACITY];
+    list->size = 0;
 
     list->capacity = DEFAULT_LIST_CAPACITY;
 
-    list->size = 0;
+    for (size_t i = 0; i < DEFAULT_LIST_CAPACITY; i++)
+    {
+        list->ptr[i] = {.value = POISON, .next = i + 1, .prev = FREE_ELEM};
+    }
+
     list->freeHead = 0;
 
-    for (size_t i = 0; i < DEFAULT_LIST_CAPACITY; i++)
-        list->data[i].value = FREE_ELEM;
-    
-    list->head->prev = NULL;
-    list->tail->next = NULL;
+    list->ptr[list->freeHead].next = 1;
+    list->ptr[list->freeHead].prev = 0;
 
     return OK;
 }
 
-ErrorCode insertToFront(List* list, ListElem_t value, size_t index)
+ErrorCode pushFront(List* list, Elem_t value)
 {
-    AssertSoft(0 <= index < list->size, INDEX_OUT_OF_RANGE);
-
-    list->size += 1;
-
-    /* realloc check */
-
-    list->data[list->freeHead].value = value;
-
-    Node* tempNode = list->data[index].next;
-
-    tempNode->prev         = &list->data[list->freeHead];
-    list->data[index].next = &list->data[list->freeHead];
-
-    list->data[list->freeHead].next = tempNode;
-    list->data[list->freeHead].prev = &list->data[index];
-
-    list->freeHead += 1;
-    
-    return OK;
+    return insertAfter(list, list->ptr[0].prev, value);
 }
 
-ErrorCode insertToBack(List* list, ListElem_t value, size_t index)
+ErrorCode pushBack(List* list, Elem_t value)
 {
-    AssertSoft(0 <= index < list->size, INDEX_OUT_OF_RANGE);
+    return insertAfter(list, list->ptr[list->size].next, value);
+}
 
-    list->size += 1;
+ErrorCode insertBefore(List* list, size_t index, Elem_t value)
+{
+    return insertAfter(list, list->ptr[index].prev, value);
+}
 
-    /* realloc check */
+ErrorCode insertAfter(List* list, size_t index, Elem_t value)
+{
+    size_t newNext = list->ptr[index].next; // assign index of next elem in index;
 
-    list->data[list->freeHead].value = value;
+    size_t curFreeIndex = list->freeHead; // where the new elem is storred
 
-    Node* tempNode = list->data[index].prev;
+    list->freeHead = list->ptr[curFreeIndex].next; //
 
-    tempNode->next         = &list->data[list->freeHead];
-    list->data[index].prev = &list->data[list->freeHead];
+    list->ptr[curFreeIndex].value = value;
 
-    list->data[list->freeHead].prev = tempNode;
-    list->data[list->freeHead].next = &list->data[index];
+    list->ptr[curFreeIndex].next = newNext;
 
-    
-    list->freeHead += 1;
+    list->ptr[curFreeIndex].prev = index;
+
+    list->ptr[index].next = curFreeIndex;
+
+    list->ptr[newNext].prev = curFreeIndex;
+
+    list->size++;
+
+    /* realloc */
 
     return OK;
-}
-
-ErrorCode pushFront(List* list, ListElem_t value)
-{
-
-}
-
-
-ErrorCode pushBack(List* list, ListElem_t value)
-{
-    list->size += 1;
-
-    list->data[list->freeHead].value = value;
-
-    list->data[list->freeHead].prev = list->head;
-    list->data[list->freeHead].next = list->head->next;
-
-    list->head->next = &list->data[list->freeHead];
-    list->data->prev = &list->data[list->freeHead];
-
-    list->freeHead += 1;
-}
-
-ErrorCode listVerify(List* list)
-{
-
 }
 
 ErrorCode printList(List* list)
 {
+    printf("physical address: \n");
 
-    printf("values stored physically:\n{\n");
-    
-    for (size_t i = 0; i < list->size; i++)
+    for (size_t i = 0; i < list->capacity; i++)
     {
-        printf("\t[%llu]: %d\n", i, list->data[i].value);
+        printf("[%llu] -> value: %d, next: %llu, prev %llu\n", i, list->ptr[i].value, list->ptr[i].next, list->ptr[i].prev);
     }
 
-    printf("}\n\n");
-
-    Node* curNode = list->head->next;
-
-    printf("values stored with nodes:\n{\n");
+    printf("\nin order:\n");
+    size_t curIndex = list->ptr[0].next;
 
     for (size_t i = 0; i < list->size; i++)
     {
-        printf("\t[%llu]: %d\n", i, curNode->value);
-        curNode = curNode->next;
+        printf("[%llu] -> value: %d, next: %llu, prev %llu\n", curIndex, list->ptr[curIndex].value, list->ptr[curIndex].next, list->ptr[curIndex].prev);
+        curIndex = list->ptr[curIndex].next;
     }
-
-    printf("}\n");
-
-    return OK;
 }
+
 
 
 

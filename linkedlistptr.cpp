@@ -19,7 +19,7 @@ ErrorCode DestroyList(List* list)
 {
     AssertSoft(list, NULL_PTR);
 
-    Node* curNode  = list->head->next;
+    Node* curNode  = list->head;
     Node* tempNode = NULL;
 
     while (curNode)
@@ -49,8 +49,10 @@ ErrorCode PrintList(List* list)
     while (curNode)
     {
         printf("\t[%lu]: "SPECIFIER" \n", index, curNode->value);
-
+        
         curNode = curNode->next;
+
+        index++;
     }
 
     printf("}\n");

@@ -35,6 +35,8 @@ int main(int argc, char* argv[])
 
     Pop(list.head->next);
 
+    FindElement(&list, 2);
+
     PrintList(&list);
 
     DestroyList(&list);

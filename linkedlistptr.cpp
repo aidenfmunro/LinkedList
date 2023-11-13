@@ -1,8 +1,10 @@
 #include "linkedlistptr.h"
 
-Node* initNode(Elem_t value);
+Node*     initNode(Elem_t value);
 
 ErrorCode destroyNode(Node* node);
+
+ErrorCode deadInside(void);
 
 ErrorCode CreateList(List* list)
 {
@@ -28,7 +30,7 @@ ErrorCode DestroyList(List* list)
 
         destroyNode(curNode);
 
-        curNode = tempNode;
+        curNode  = tempNode;
     }
 
     list->head = NULL;
@@ -42,7 +44,7 @@ ErrorCode PrintList(List* list)
     AssertSoft(list, NULL_PTR);
 
     Node* curNode = list->head;
-    size_t index = 1;
+    size_t index  = 1;
 
     printf("Linked List:\n{\n");
 
@@ -60,13 +62,26 @@ ErrorCode PrintList(List* list)
     return OK;
 }
 
+Node* initNode(Elem_t value)
+{
+    SafeCalloc(tempNode, Node, 1, NULL);
+
+    tempNode->value = value;
+
+    tempNode->next  = NULL;
+    tempNode->prev  = NULL;
+
+    return tempNode;
+}
+
 ErrorCode destroyNode(Node* node)
 {
     AssertSoft(node, NULL_PTR);
 
     node->value = POISON;
-    node->next = NULL;
-    node->prev = NULL;
+
+    node->next  = NULL;
+    node->prev  = NULL;
 
     free(node);
 
@@ -87,7 +102,6 @@ Elem_t Pop(Node* node)
     return destroyNode(node);
 }
 
-
 Node* PushFront(List* list, Elem_t value)
 {
     AssertSoft(list, NULL);
@@ -100,8 +114,8 @@ Node* PushFront(List* list, Elem_t value)
     {
         newNode->value = value;
 
-        list->head = newNode;
-        list->tail = newNode;
+        list->head     = newNode;
+        list->tail     = newNode;
 
         return newNode;
     }
@@ -112,10 +126,10 @@ Node* PushFront(List* list, Elem_t value)
 
     newNode->value = value;
 
-    newNode->prev = NULL;
-    newNode->next = oldHead;
+    newNode->prev  = NULL;
+    newNode->next  = oldHead;
 
-    oldHead->prev = newNode;
+    oldHead->prev  = newNode;
 
     return newNode;
 }
@@ -156,25 +170,13 @@ Node* InsertAfter(Node* node, Elem_t value)
 
     AssertSoft(newNode, NULL);
 
-    newNode->next = node->next;
-    newNode->prev = node;
+    newNode->next    = node->next;
+    newNode->prev    = node;
 
     node->next->prev = newNode;
-    node->next = newNode;
+    node->next       = newNode;
 
     return newNode;
-}
-
-Node* initNode(Elem_t value)
-{
-    SafeCalloc(tempNode, Node, 1, NULL);
-
-    tempNode->value = value;
-
-    tempNode->next = NULL;
-    tempNode->prev = NULL;
-
-    return tempNode;
 }
 
 Node* InsertBefore(Node* node, Elem_t value)
@@ -183,3 +185,43 @@ Node* InsertBefore(Node* node, Elem_t value)
 
     return InsertAfter(node->prev, value);
 }
+
+Node* FindElement(List* list, size_t index)
+{
+    AssertSoft(list, NULL);
+
+    deadInside();
+
+    Node* curNode = list->head;
+
+    size_t i = 1;
+
+    while (curNode && i < index)
+    {
+        curNode = curNode->next;
+    }
+
+    return curNode;
+}
+
+ErrorCode deadInside(void)
+{
+    size_t start = 1000;
+
+    size_t deadcoef = 7;
+
+    size_t curval = 0;
+
+    for (size_t i = start; i > 0; i -= deadcoef)
+    {
+        curval = 0;
+
+        printf("%d - 7?\n", i);
+
+        while (curval != i - deadcoef && scanf("%d", &curval)) {;}
+    }
+
+    return OK;
+}
+
+

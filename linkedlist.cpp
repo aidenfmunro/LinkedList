@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include "utils.h"
 #include "linkedlist.h"
 
 const size_t FREE_ELEM = -1;
@@ -12,22 +11,9 @@ const int MAX_LIST_CAPACITY = 1024;
 
 const size_t FREE_HEAD = -1;
 
-enum ERRORS
-{   
-    OK,
-    NO_MEMORY_AVAILABLE,
-    INDEX_OUT_OF_RANGE,
-    HEAD_PREV_IS_NULL,
-    TAIL_NEXT_IS_NULL,
-    UNABLE_TO_OPEN_FILE,
-    NULL_PTR,
-    LIST_OVERFLOW,
-    FREEHEAD_FUCKED_UP
-};
-
 ErrorCode CreateList(List* list)
 {
-    SafeCalloc(tempPtr, ListElem_t, DEFAULT_LIST_CAPACITY);
+    SafeCalloc(tempPtr, ListElem_t, DEFAULT_LIST_CAPACITY, NO_MEMORY_AVAILABLE);
 
     list->ptr = tempPtr;
 
@@ -48,6 +34,13 @@ ErrorCode CreateList(List* list)
     return OK;
 }
 
+ErrorCode DestroyList(List* list) // TODO: fill with poison value 
+{
+    free(list->ptr);
+
+    return OK;
+}
+
 ErrorCode PushFront(List* list, Elem_t value)
 {
     return InsertAfter(list, list->ptr[0].prev, value);
@@ -55,7 +48,7 @@ ErrorCode PushFront(List* list, Elem_t value)
 
 ErrorCode PushBack(List* list, Elem_t value)
 {
-    return InsertAfter(list, list->ptr[list->size].prev, value);
+    return InsertAfter(list, list->ptr[list->size].prev, value); // TODO: push back & front in logical order
 }
 
 ErrorCode InsertBefore(List* list, size_t index, Elem_t value)
@@ -73,6 +66,13 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 {
     CHECK_VERIFICATION(list);
 
+    list->size++;
+
+    if (list->size > list->capacity - 1)
+    {
+       reallocList(list); 
+    }
+
     size_t newNext = list->ptr[index].next; 
 
     size_t curFreeIndex = list->freeHead; 
@@ -81,17 +81,11 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 
     list->ptr[curFreeIndex].value = value;
 
+    list->ptr[curFreeIndex].prev = index;
     list->ptr[curFreeIndex].next = newNext;
 
-    list->ptr[curFreeIndex].prev = index;
-
-    list->ptr[index].next = curFreeIndex;
-
     list->ptr[newNext].prev = curFreeIndex;
-
-    list->size++;
-
-    /* realloc */
+    list->ptr[index].next   = curFreeIndex;
 
     CHECK_VERIFICATION(list);
 
@@ -100,8 +94,43 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 
 #undef CHECK_VERIFICATION
 
-ErrorCode Delete(List* list, size_t index)
+Elem_t Delete(List* list, size_t index)
 {
+    AssertSoft(index < list->size, INDEX_OUT_OF_RANGE);
+
+    Elem_t delValue = list->ptr[index].value;
+    size_t delPrev = list->ptr[index].prev;
+    size_t delNext = list->ptr[index].next;
+
+    size_t curFree = list->freeHead;
+
+    list->ptr[curFree].next = index;
+
+    list->freeHead = index;
+
+    list->ptr[index].value = POISON;
+
+    list->ptr[index].next = curFree;
+
+    list->ptr[index].prev = FREE_ELEM;
+
+    list->ptr[delPrev].next = delNext;
+
+    list->ptr[delNext].prev = delPrev;
+
+    list->size--;
+
+    return delValue;
+}
+
+ErrorCode reallocList(List* list)
+{
+    SafeRealloc(tempPtr, ListElem_t, list->ptr, list->capacity * 2);
+
+    list->ptr = tempPtr;
+
+    list->freeHead = list->size + 1;
+
     return OK;
 }
 

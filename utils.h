@@ -1,14 +1,35 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+typedef int ErrorCode;
+
+enum ERRORS
+{   
+    OK,
+    NO_MEMORY_AVAILABLE,
+    INDEX_OUT_OF_RANGE,
+    HEAD_PREV_IS_NULL,
+    TAIL_NEXT_IS_NULL,
+    UNABLE_TO_OPEN_FILE,
+    NULL_PTR,
+    LIST_OVERFLOW,
+    FREEHEAD_FUCKED_UP
+};
+
 #define CheckPointerValidation(pointer)     \
     do {                                    \
         if (!isPointerValid(&pointer))      \
             return INVALID_PTR;             \
        } while(0);
 
-#define SafeCalloc(var, type, nmemb)                    \
+#define SafeCalloc(var, type, nmemb, error)             \
     type* var = (type*)calloc(nmemb, sizeof(type));     \
+                                                        \
+    if (!var)                                           \
+        return error;
+
+#define SafeRealloc(var, type, ptr, size)               \
+    type* var = (type*)realloc(ptr, size);              \
                                                         \
     if (!var)                                           \
         return NO_MEMORY_AVAILABLE;

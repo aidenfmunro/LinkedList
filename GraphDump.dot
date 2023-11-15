@@ -1,24 +1,26 @@
-digraph
-{
-rankdir = LR;
-node [shape = record, color = "#fffdd0", fontname = helvetica, fontsize = 10];
-bgcolor = "#ffffff";
-ROOT[style = "filled", fillcolor = "#ff0000", label = "ROOT|{<head>head = 6|<tail>tail = 8}"];
-NODE_1[style = "filled", fillcolor = "#fffdd0", label = "index = 1|value\n30|{prev = 5|next = 4}"];
-NODE_2[style = "filled", fillcolor = "#fffdd0", label = "index = 2|value\n40|{prev = 3|next = 5}"];
-NODE_3[style = "filled", fillcolor = "#fffdd0", label = "index = 3|value\n60|{prev = 6|next = 2}"];
-NODE_4[style = "filled", fillcolor = "#fffdd0", label = "index = 4|value\n70|{prev = 1|next = 7}"];
-NODE_5[style = "filled", fillcolor = "#fffdd0", label = "index = 5|value\n80|{prev = 2|next = 1}"];
-NODE_6[style = "filled", fillcolor = "#fffdd0", label = "index = 6|value\n90|{prev = 0|next = 3}"];
-NODE_7[style = "filled", fillcolor = "#fffdd0", label = "index = 7|value\n70|{prev = 4|next = 8}"];
-NODE_8[style = "filled", fillcolor = "#fffdd0", label = "index = 8|value\n100|{prev = 7|next = 0}"];
-NODE_9[style = "filled", fillcolor = "#fffdd0", label = "index = 9|value\n-1|{prev = 18446744073709551615|next = 10}"];
-NODE_10[style = "filled", fillcolor = "#fffdd0", label = "index = 10|value\n-1|{prev = 18446744073709551615|next = 11}"];
-NODE_11[style = "filled", fillcolor = "#fffdd0", label = "index = 11|value\n-1|{prev = 18446744073709551615|next = 12}"];
-NODE_12[style = "filled", fillcolor = "#fffdd0", label = "index = 12|value\n-1|{prev = 18446744073709551615|next = 13}"];
-NODE_13[style = "filled", fillcolor = "#fffdd0", label = "index = 13|value\n-1|{prev = 18446744073709551615|next = 14}"];
-NODE_14[style = "filled", fillcolor = "#fffdd0", label = "index = 14|value\n-1|{prev = 18446744073709551615|next = 15}"];
-NODE_15[style = "filled", fillcolor = "#fffdd0", label = "index = 15|value\n-1|{prev = 18446744073709551615|next = 0}"];
+  digraph
+  {
+  rankdir = LR;
+  node [shape = record, color = "#fffdd0", fontname = helvetica, fontsize = 10];
+  bgcolor = "#ffffff";
+  ROOT[style = "filled", fillcolor = "#ff0000",   label = "ROOT|{<head>head = 6|<tail>tail = 9}"];
+  FREE_HEAD[style = "filled", fillcolor = "#b9e793",   label = "FREE_HEAD|<free>free = 10"];
+  NODE_1[style = "filled", fillcolor = "#fffdd0",   label = "index = 1|value\n30|{prev = 5|next = 4}"];
+  NODE_2[style = "filled", fillcolor = "#fffdd0",   label = "index = 2|value\n40|{prev = 3|next = 5}"];
+  NODE_3[style = "filled", fillcolor = "#fffdd0",   label = "index = 3|value\n60|{prev = 6|next = 2}"];
+  NODE_4[style = "filled", fillcolor = "#fffdd0",   label = "index = 4|value\n70|{prev = 1|next = 7}"];
+  NODE_5[style = "filled", fillcolor = "#fffdd0",   label = "index = 5|value\n80|{prev = 2|next = 1}"];
+  NODE_6[style = "filled", fillcolor = "#fffdd0",   label = "index = 6|value\n90|{prev = 0|next = 3}"];
+  NODE_7[style = "filled", fillcolor = "#fffdd0",   label = "index = 7|value\n70|{prev = 4|next = 8}"];
+  NODE_8[style = "filled", fillcolor = "#fffdd0",   label = "index = 8|value\n100|{prev = 7|next = 9}"];
+  NODE_9[style = "filled", fillcolor = "#fffdd0",   label = "index = 9|value\n110|{prev = 8|next = 0}"];
+  NODE_10[style = "filled", fillcolor = "#fffdd0",   label = "index = 10|value\n-1|{prev = 18446744073709551615|next = 11}"];
+  NODE_11[style = "filled", fillcolor = "#fffdd0",   label = "index = 11|value\n-1|{prev = 18446744073709551615|next = 12}"];
+  NODE_12[style = "filled", fillcolor = "#fffdd0",   label = "index = 12|value\n-1|{prev = 18446744073709551615|next = 13}"];
+  NODE_13[style = "filled", fillcolor = "#fffdd0",   label = "index = 13|value\n-1|{prev = 18446744073709551615|next = 14}"];
+  NODE_14[style = "filled", fillcolor = "#fffdd0",   label = "index = 14|value\n-1|{prev = 18446744073709551615|next = 15}"];
+  NODE_15[style = "filled", fillcolor = "#fffdd0",   label = "index = 15|value\n-1|{prev = 18446744073709551615|next = 0}"];
 ROOT->NODE_1->NODE_2->NODE_3->NODE_4->NODE_5->NODE_6->NODE_7->NODE_8->NODE_9->NODE_10->NODE_11->NODE_12->NODE_13->NODE_14->NODE_15 [weight = 100000, color = "#ffffff"];
-ROOT:head->NODE_6->NODE_3->NODE_2->NODE_5->NODE_1->NODE_4->NODE_7->NODE_8->ROOT:tail;
-}
+ROOT:head->NODE_6->NODE_3->NODE_2->NODE_5->NODE_1->NODE_4->NODE_7->NODE_8->NODE_9->ROOT:tail;
+FREE_HEAD:free->NODE_10;
+  }

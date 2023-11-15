@@ -9,6 +9,8 @@ typedef int Elem_t;
  
 const size_t FREE_ELEM = -1;
 
+const int MULTIPLIER = 2;
+
 const Elem_t POISON = __INT64_MAX__;
 
 const int DEFAULT_LIST_CAPACITY = 8;

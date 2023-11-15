@@ -1,3 +1,7 @@
+#include "dsl.h"
+
+#include "graphparams.h"
+
 #include "linkedlist.h"
 
 // TD: linearization
@@ -19,23 +23,23 @@ ErrorCode CreateList(List* list)
     // DSL: add_to_free
     for (size_t i = 0; i < DEFAULT_LIST_CAPACITY; i++)
     {
-        list->ptr[i].value = POISON;
+        VALUE(i) = POISON;
     }
 
     for (size_t i = 1; i < DEFAULT_LIST_CAPACITY - 1; i++)
     {
-        list->ptr[i].next = i + 1;
+        NEXT(i) = i + 1;
     }
 
     for (size_t i = 1; i < DEFAULT_LIST_CAPACITY; i++)
     {
-        list->ptr[i].prev = FREE_ELEM;
+        PREV(i) = FREE_ELEM;
     }
 
     list->freeHead = 1;
 
-    list->head = list->ptr[0].next;
-    list->tail = list->ptr[0].prev; // TD: sensiel
+    list->head = NEXT(0);
+    list->tail = PREV(0); // TD: sensiel
 
     return OK;
 }
@@ -69,15 +73,15 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
     // TD: DSL - CONNECT_NODES(node1, node2)
     size_t insertIndex = list->freeHead; 
 
-    list->freeHead = list->ptr[insertIndex].next; 
+    list->freeHead     = NEXT(insertIndex);
 
-    list->ptr[insertIndex].value = value;
+    VALUE(insertIndex) = value;
 
-    list->ptr[insertIndex].prev = index;
-    list->ptr[insertIndex].next = list->ptr[index].next; // NEXT(index)
+    PREV(insertIndex)  = index;
+    NEXT(insertIndex)  = NEXT(index); // NEXT(index)
 
-    list->ptr[list->ptr[index].next].prev = insertIndex;
-    list->ptr[index].next = insertIndex;
+    PREV(NEXT(index))  = insertIndex;
+    NEXT(index)        = insertIndex;
 
     CHECK_VERIFICATION(listVerify(list));
 
@@ -88,7 +92,7 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
 
 ErrorCode InsertBefore(List* list, size_t index, Elem_t value)
 {
-    return InsertAfter(list, list->ptr[index].prev, value);
+    return InsertAfter(list, PREV(index), value);
 }
 
 ErrorCode PushFront(List* list, Elem_t value)
@@ -105,25 +109,25 @@ Elem_t Pop(List* list, size_t index)
 {
     AssertSoft(index < list->size, INDEX_OUT_OF_RANGE);
 
-    Elem_t value   = list->ptr[index].value;
-    size_t delPrev = list->ptr[index].prev;
-    size_t delNext = list->ptr[index].next;
+    Elem_t value   = VALUE(index);
+    size_t delPrev = PREV(index);
+    size_t delNext = NEXT(index);
 
     size_t curFree = list->freeHead;
 
-    list->ptr[curFree].next = index;
+    NEXT(curFree) = index;
 
     list->freeHead = index;
 
-    list->ptr[index].value = POISON;
+    VALUE(index) = POISON;
 
-    list->ptr[index].next = curFree;
+    NEXT(index) = curFree;
 
-    list->ptr[index].prev = FREE_ELEM;
+    PREV(index) = FREE_ELEM;
 
-    list->ptr[delPrev].next = delNext;
+    NEXT(delPrev) = delNext;
 
-    list->ptr[delNext].prev = delPrev;
+    PREV(delNext) = delPrev;
 
     list->size--;
 
@@ -132,26 +136,28 @@ Elem_t Pop(List* list, size_t index)
 
 ErrorCode reallocList(List* list)
 {
-    SafeRealloc(tempPtr, ListElem_t, list->ptr, list->capacity * 2 * sizeof(ListElem_t));
+    SafeRealloc(tempPtr, ListElem_t, list->ptr, list->capacity * MULTIPLIER * sizeof(ListElem_t));
+
+    size_t capacityExtended = list->capacity * MULTIPLIER;
 
     list->ptr = tempPtr;
 
-    for (size_t i = list->capacity; i < list->capacity * 2 - 1; i++)
+    for (size_t i = list->capacity; i < capacityExtended - 1; i++)
     {
-        list->ptr[i].next = i + 1;
+        NEXT(i) = i + 1;
     }
 
-    for (size_t i = list->capacity; i < list->capacity * 2; i++)
+    for (size_t i = list->capacity; i < capacityExtended; i++)
     {
-        list->ptr[i].value = POISON;
-        list->ptr[i].prev = FREE_ELEM;
+        VALUE(i) = POISON;
+        PREV(i) = FREE_ELEM;
     }
     
-    list->ptr[list->capacity * 2 - 1].next = 0; // TD: harcode 
+    NEXT(capacityExtended - 1) = 0; 
 
     list->freeHead = list->capacity;
 
-    list->capacity = list->capacity * 2;
+    list->capacity = capacityExtended;
 
     return OK;
 }
@@ -162,7 +168,7 @@ ErrorCode PrintList(List* list)
 
     for (size_t i = 0; i < list->capacity; i++)
     {
-        printf("[%lu] -> value: %d, next: %lu, prev %lu\n", i, list->ptr[i].value, list->ptr[i].next, list->ptr[i].prev);
+        printf("[%lu] -> value: %d, next: %lu, prev %lu\n", i, VALUE(i), NEXT(i), PREV(i));
     }
 
     printf("\nin order:\n");
@@ -171,8 +177,9 @@ ErrorCode PrintList(List* list)
 
     for (size_t i = 0; i < list->size; i++)
     {
-        printf("[%lu] -> value: %d, next: %lu, prev %lu\n", curIndex, list->ptr[curIndex].value, list->ptr[curIndex].next, list->ptr[curIndex].prev);
-        curIndex = list->ptr[curIndex].next;
+        printf("[%lu] -> value: %d, next: %lu, prev %lu\n", curIndex, VALUE(curIndex), NEXT(curIndex), PREV(curIndex));
+
+        curIndex = NEXT(curIndex);
     }
 
     return OK;
@@ -200,45 +207,30 @@ ErrorCode listVerify(List* list)
 
 #undef CHECK_ERROR
 
-#define GRAPH_DUMP_FILENAME "GraphDump.dot"
-
-#define FONT_SIZE "10"
-
-#define FONT_NAME "helvetica"
-
-#define NODE_FRAME_COLOR "\"#fffdd0\""
-
-#define BACKGROUND_COLOR "\"#ffffff\""
-
-#define FREE_HEAD_COLOR "\"#b9e793\""
-
-#define NODE_COLOR "\"#fffdd0\""
-
-#define ROOT_COLOR "\"#ff0000\""
-
 #define dumpGraph(filename, ...) fprintf(filename, __VA_ARGS__)
 
 ErrorCode DumpListGraph(List* list)
 {
     myOpen(GRAPH_DUMP_FILENAME, "w", graphFile);
 
-    dumpGraph(graphFile,
-    "digraph\n"
-    "{\n"
-    "rankdir = LR;\n"
-    "node [shape = record, color = " NODE_FRAME_COLOR ", fontname = " FONT_NAME ", fontsize = " FONT_SIZE "];\n"
-    "bgcolor = " BACKGROUND_COLOR ";\n"
-    "ROOT[style = \"filled\", fillcolor = " ROOT_COLOR ", "
-    "label = \"ROOT|{<head>head = %zu|<tail>tail = %zu}\"];\n",
-    list->ptr[0].next, list->ptr[0].prev
+    dumpGraph(graphFile, "  digraph\n"
+                         "  {\n"
+                         "  rankdir = LR;\n"
+                         "  node [shape = record, color = " NODE_FRAME_COLOR ", fontname = " FONT_NAME ", fontsize = " FONT_SIZE "];\n"
+                         "  bgcolor = " BACKGROUND_COLOR ";\n"
+                         "  ROOT[style = \"filled\", fillcolor = " ROOT_COLOR ", "
+                         "  label = \"ROOT|{<head>head = %zu|<tail>tail = %zu}\"];\n"
+                         "  FREE_HEAD[style = \"filled\", fillcolor = " FREE_HEAD_COLOR ", "
+                         "  label = \"FREE_HEAD|<free>free = %zu\"];\n",
+                            NEXT(0), PREV(0), list->freeHead
     );
 
     for (size_t i = 1; i < list->capacity; i++)
     {
         dumpGraph(graphFile,
-        "NODE_%zu[style = \"filled\", fillcolor = " NODE_COLOR ", "
-        "label = \"index = %lu|value\\n%d|{prev = %lu|next = %lu}\"];\n",
-        i, i, list->ptr[i].value, list->ptr[i].prev, list->ptr[i].next
+                            "  NODE_%zu[style = \"filled\", fillcolor = " NODE_COLOR ", "
+                            "  label = \"index = %lu|value\\n%d|{prev = %lu|next = %lu}\"];\n",
+                            i, i, VALUE(i), PREV(i), NEXT(i)
         );
     }
 
@@ -253,25 +245,29 @@ ErrorCode DumpListGraph(List* list)
 
     dumpGraph(graphFile, "ROOT:head");
 
-    size_t nodePointer = list->ptr[0].next;
+    size_t nodePointer = NEXT(0);
 
     for (size_t i = 1; i < list->size; i++)
     {
         dumpGraph(graphFile, "->NODE_%zu", nodePointer);
 
-        nodePointer = list->ptr[nodePointer].next;
+        nodePointer = NEXT(nodePointer);
     }
 
-    dumpGraph(graphFile, "->ROOT:tail");
-    
-    dumpGraph(graphFile, ";\n"
-    "}\n"
+    dumpGraph(graphFile, "->ROOT:tail;\n");
+
+    dumpGraph(graphFile, "FREE_HEAD:free->NODE_%zu;\n", 
+                            list->freeHead
     );
+    
+    dumpGraph(graphFile, "  }\n");
 
     myClose(graphFile);
 
     return OK;
 }
+
+#undef dumpGraph
 
 
 

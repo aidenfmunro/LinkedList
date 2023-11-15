@@ -17,6 +17,7 @@ int main(void)
     PushBack(&list, 70);
     PushBack(&list, 100);
     PrintList(&list);
+    PushBack(&list, 110);
     DumpListGraph(&list);
     
     DestroyList(&list);

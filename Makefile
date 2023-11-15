@@ -22,7 +22,7 @@ $(PREF_OBJ)%.o : $(PREF_SRC)%.cpp
 	$(CC) $(HEADERS) $(CFLAGS) -c $^ -o $@
 
 draw:
-	dot -Tpng treegraph.dot -o tree.png
+	dot -Tpng GraphDump.dot -o tree.png
 
 dirs:
 	mkdir obj log log/txt log/dot log/img

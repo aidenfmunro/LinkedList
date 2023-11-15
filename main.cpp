@@ -1,43 +1,48 @@
-#include "linkedlistptr.h"
+// #include "linkedlistptr.h"
 
-int main(int argc, char* argv[])
+#include "linkedlist.h"
+
+int main(void)
 {
+    List list = {};
+    
+    CreateList(&list);
+    
+    PushFront(&list, 30);
+    PushFront(&list, 40);
+    InsertAfter(&list, 0, 60);
+    InsertAfter(&list, 1, 70);
+    InsertAfter(&list, 2, 80);
+    PushFront(&list, 90);
+    PushBack(&list, 70);
+    PushBack(&list, 100);
+    PrintList(&list);
+    DumpListGraph(&list);
+    
+    DestroyList(&list);
+
     //List list = {};
-    //
+//
     //CreateList(&list);
-    //
-    //InsertAfter(&list, 0, 20);
-    //InsertAfter(&list, 0, 30);
-    //InsertAfter(&list, 0, 40);
-    //InsertAfter(&list, 2, 60);
-    //InsertAfter(&list, 1, 70);
-    //InsertAfter(&list, 3, 80);
-    //InsertAfter(&list, 4, 90);
+//
+    //PushFront(&list, 10);
+//
+    //PushFront(&list, 20);
+//
+    //InsertAfter(list.head, 30);
+//
+    //InsertBefore(list.head->next, 40);
+//
+    //PushBack(&list, 50);
+//
     //PrintList(&list);
-    //
+//
+    //Pop(list.head->next);
+//
+    //PrintList(&list);
+//
+    //DumpListGraph(&list);   
+//
     //DestroyList(&list);
 
-    List list = {};
-
-    CreateList(&list);
-
-    PushFront(&list, 10);
-
-    PushFront(&list, 20);
-
-    InsertAfter(list.head, 30);
-
-    InsertBefore(list.head->next, 40);
-
-    PushBack(&list, 50);
-
-    PrintList(&list);
-
-    Pop(list.head->next);
-
-    FindElement(&list, 2);
-
-    PrintList(&list);
-
-    DestroyList(&list);
 }

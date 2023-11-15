@@ -31,6 +31,8 @@ ErrorCode DestroyList(List* list);
 
 ErrorCode PrintList(List* list);
 
+ErrorCode DumpListGraph(List* list);
+
 Node*     PushFront(List* list, Elem_t value);
 
 Node*     PushBack(List* list, Elem_t value);

@@ -5,7 +5,17 @@
 #include <stdlib.h>
 #include "utils.h"
 
-typedef int Elem_t; 
+typedef int Elem_t;
+ 
+const size_t FREE_ELEM = -1;
+
+const Elem_t POISON = __INT64_MAX__;
+
+const int DEFAULT_LIST_CAPACITY = 8;
+
+const int MAX_LIST_CAPACITY = 1024;
+
+const size_t FREE_HEAD = -1;
 
 struct ListElem_t
 {
@@ -41,7 +51,7 @@ ErrorCode InsertBefore(List* list, size_t index, Elem_t value);
 
 ErrorCode reallocList(List* list);
 
-ErrorCode Delete(List* list, size_t index);
+Elem_t    Pop(List* list, size_t index);
 
 ErrorCode PrintList(List* list);
 

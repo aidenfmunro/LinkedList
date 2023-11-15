@@ -48,6 +48,7 @@ ErrorCode PrintList(List* list)
 
     printf("Linked List:\n{\n");
 
+    // ApplyToEachNode(RootNode*, void processNode(Node*))
     while (curNode)
     {
         printf("\t[%lu]: "SPECIFIER" \n", index, curNode->value);
@@ -64,7 +65,7 @@ ErrorCode PrintList(List* list)
 
 Node* initNode(Elem_t value)
 {
-    SafeCalloc(tempNode, Node, 1, NULL);
+    SafeCalloc(tempNode, Node, 1, NULL); // TD: calloc-like 1, Node
 
     tempNode->value = value;
 
@@ -220,6 +221,76 @@ ErrorCode deadInside(void)
 
         while (curval != i - deadcoef && scanf("%d", &curval)) {;}
     }
+
+    return OK;
+}
+
+#define GRAPH_DUMP_FILENAME "ClassicGraphDump.dot"
+
+#define FONT_SIZE "10"
+
+#define FONT_NAME "helvetica"
+
+#define NODE_FRAME_COLOR "\"#fffdd0\""
+
+#define BACKGROUND_COLOR "\"#ffffff\""
+
+#define FREE_HEAD_COLOR "\"#b9e793\""
+
+#define NODE_COLOR "\"#fffdd0\""
+
+#define dumpGraph(filename, ...) fprintf(filename, __VA_ARGS__)
+
+ErrorCode DumpListGraph(List* list)
+{
+    myOpen(GRAPH_DUMP_FILENAME, "w", graphFile);
+
+    dumpGraph(graphFile,
+    "digraph\n"
+    "{\n"
+    "rankdir = LR;\n"
+    "node [shape = record, color = " NODE_FRAME_COLOR ", fontname = " FONT_NAME ", fontsize = " FONT_SIZE "];\n"
+    "bgcolor = " BACKGROUND_COLOR ";\n"
+    );
+
+    Node* curNode = list->head;
+
+    size_t i = 1;
+
+    while (curNode)
+    {
+        // create_node(Node*)
+        // create_node(name, color, label_fmt, ...);
+
+        dumpGraph(graphFile,
+        "NODE_%zu[style = \"filled\", fillcolor = " NODE_COLOR ", "
+        "label = \"index = %lu|value\\n%d|\"];\n",
+        i, i, curNode->value
+        );
+
+        curNode = curNode->next;
+        i++;
+    }
+
+    dumpGraph(graphFile, "NODE_0");
+
+    curNode = list->head;
+
+    i = 1;
+
+    while (curNode)
+    {
+        dumpGraph(graphFile, "->NODE_%zu", i);
+
+        curNode = curNode->next;
+        i++;
+    }
+    
+    dumpGraph(graphFile, ";\n"
+    "}\n"
+    );
+
+    myClose(graphFile);
 
     return OK;
 }

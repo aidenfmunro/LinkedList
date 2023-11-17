@@ -18,9 +18,9 @@ ErrorCode CreateList(List* list)
 
     list->capacity = DEFAULT_LIST_CAPACITY;
 
-
     // TD: fill_range()
     // DSL: add_to_free
+
     for (size_t i = 0; i < DEFAULT_LIST_CAPACITY; i++)
     {
         VALUE(i) = POISON;
@@ -69,7 +69,6 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
     {
        reallocList(list); 
     }
-
     // TD: DSL - CONNECT_NODES(node1, node2)
     size_t insertIndex = list->freeHead; 
 
@@ -78,7 +77,7 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
     VALUE(insertIndex) = value;
 
     PREV(insertIndex)  = index;
-    NEXT(insertIndex)  = NEXT(index); // NEXT(index)
+    NEXT(insertIndex)  = NEXT(index);
 
     PREV(NEXT(index))  = insertIndex;
     NEXT(index)        = insertIndex;
@@ -162,6 +161,13 @@ ErrorCode reallocList(List* list)
     return OK;
 }
 
+ErrorCode UntangleList(List* list)
+{
+    SafeCalloc(tempPtr, ListElem_t, list->size, NULL_PTR)
+
+    
+}
+
 ErrorCode PrintList(List* list)
 {
     printf("physical address: \n");
@@ -218,7 +224,7 @@ ErrorCode DumpListGraph(List* list)
                          "  rankdir = LR;\n"
                          "  node [shape = record, color = " NODE_FRAME_COLOR ", fontname = " FONT_NAME ", fontsize = " FONT_SIZE "];\n"
                          "  bgcolor = " BACKGROUND_COLOR ";\n"
-                         "  ROOT[style = \"filled\", fillcolor = " ROOT_COLOR ", "
+                         "  ROOT[style#FE6200 = \"filled\", fillcolor = " ROOT_COLOR ", "
                          "  label = \"ROOT|{<head>head = %zu|<tail>tail = %zu}\"];\n"
                          "  FREE_HEAD[style = \"filled\", fillcolor = " FREE_HEAD_COLOR ", "
                          "  label = \"FREE_HEAD|<free>free = %zu\"];\n",
@@ -268,8 +274,3 @@ ErrorCode DumpListGraph(List* list)
 }
 
 #undef dumpGraph
-
-
-
-
-

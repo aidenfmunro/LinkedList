@@ -53,7 +53,7 @@ ErrorCode InsertBefore(List* list, size_t index, Elem_t value);
 
 ErrorCode reallocList(List* list);
 
-Elem_t    Pop(List* list, size_t index);
+Elem_t    Remove(List* list, size_t index);
 
 ErrorCode PrintList(List* list);
 

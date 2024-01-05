@@ -9,15 +9,8 @@ int main(void)
     CreateList(&list);
     
     PushFront(&list, 30);
-    PushFront(&list, 40);
-    InsertAfter(&list, 0, 60);
-    InsertAfter(&list, 1, 70);
-    InsertAfter(&list, 2, 80);
-    PushFront(&list, 90);
-    PushBack(&list, 70);
-    PushBack(&list, 100);
+    Remove(&list, 1);
     PrintList(&list);
-    PushBack(&list, 110);
     DumpListGraph(&list);
     
     DestroyList(&list);

@@ -69,7 +69,7 @@ ErrorCode InsertAfter(List* list, size_t index, Elem_t value)
     {
        reallocList(list); 
     }
-    // TD: DSL - CONNECT_NODES(node1, node2)
+    // TODO: DSL - CONNECT_NODES(node1, node2)
     size_t insertIndex = list->freeHead; 
 
     list->freeHead     = NEXT(insertIndex);
@@ -99,12 +99,12 @@ ErrorCode PushFront(List* list, Elem_t value)
     return InsertAfter(list, list->head, value);
 }
 
-ErrorCode PushBack(List* list, Elem_t value)
+ErrorCode PushBack(List* list, Elem_t value) // TODO: return physical address
 {
     return InsertBefore(list, list->tail, value); 
 }
-
-Elem_t Pop(List* list, size_t index)
+    
+Elem_t Remove(List* list, size_t index)
 {
     AssertSoft(index < list->size, INDEX_OUT_OF_RANGE);
 
@@ -161,11 +161,41 @@ ErrorCode reallocList(List* list)
     return OK;
 }
 
-ErrorCode UntangleList(List* list)
+ErrorCode linearizeList(List* list)
 {
-    SafeCalloc(tempPtr, ListElem_t, list->size, NULL_PTR)
+    SafeCalloc(tempPtr, ListElem_t, list->capacity, NULL_PTR)
 
-    
+    size_t curIndex = list->head;
+
+    size_t counter = 1;
+
+    while (curIndex)
+    {
+        tempPtr[counter].value = VALUE(curIndex);
+        curIndex = NEXT(curIndex);
+    }
+
+    for (size_t i = list->size; i < list->capacity; i++)
+    {
+        VALUE(i) = POISON;
+    }
+
+    for (size_t i = 1; i < list->capacity - 1; i++)
+    {
+        NEXT(i) = i + 1;
+    }
+
+    for (size_t i = 1; i < list->capacity; i++)
+    {
+        PREV(i) = FREE_ELEM;
+    }
+
+    list->head = PREV(0);
+    list->tail = NEXT(0);
+
+    list->freeHead = list->size;
+
+    return OK;
 }
 
 ErrorCode PrintList(List* list)
@@ -224,7 +254,7 @@ ErrorCode DumpListGraph(List* list)
                          "  rankdir = LR;\n"
                          "  node [shape = record, color = " NODE_FRAME_COLOR ", fontname = " FONT_NAME ", fontsize = " FONT_SIZE "];\n"
                          "  bgcolor = " BACKGROUND_COLOR ";\n"
-                         "  ROOT[style#FE6200 = \"filled\", fillcolor = " ROOT_COLOR ", "
+                         "  ROOT[style = \"filled\", fillcolor = " ROOT_COLOR ", "
                          "  label = \"ROOT|{<head>head = %zu|<tail>tail = %zu}\"];\n"
                          "  FREE_HEAD[style = \"filled\", fillcolor = " FREE_HEAD_COLOR ", "
                          "  label = \"FREE_HEAD|<free>free = %zu\"];\n",
@@ -240,7 +270,7 @@ ErrorCode DumpListGraph(List* list)
         );
     }
 
-    dumpGraph(graphFile, "ROOT");
+    dumpGraph(graphFile, "ROOT"); // TODO: show -1 in png file for better view
 
     for (size_t i = 1; i < list->capacity; i++)
     {

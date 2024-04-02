@@ -9,34 +9,12 @@ int main(void)
     CreateList(&list);
     
     PushFront(&list, 30);
-    Remove(&list, 1);
+    PushFront(&list, 20);
+    PushFront(&list, 15);
+    PushBack(&list, 12);
     PrintList(&list);
     DumpListGraph(&list);
     
     DestroyList(&list);
-
-    //List list = {};
-    //
-    //CreateList(&list);
-    //
-    //PushFront(&list, 10);
-    //
-    //PushFront(&list, 20);
-    //
-    //InsertAfter(list.head, 30);
-    //
-    //InsertBefore(list.head->next, 40);
-    //
-    //PushBack(&list, 50);
-    //
-    //PrintList(&list);
-    //
-    //Pop(list.head->next);
-    //
-    //PrintList(&list);
-    //
-    //DumpListGraph(&list);   
-    //
-    //DestroyList(&list);
 
 }

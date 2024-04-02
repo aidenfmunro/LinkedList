@@ -243,11 +243,24 @@ ErrorCode listVerify(List* list)
 
 #undef CHECK_ERROR
 
+const int MAX_FILENAME_LENGTH = 256;
+const int MAX_COMMAND_LENGTH  = 256;
+
 #define dumpGraph(filename, ...) fprintf(filename, __VA_ARGS__)
 
 ErrorCode DumpListGraph(List* list)
 {
-    myOpen(GRAPH_DUMP_FILENAME, "w", graphFile);
+    static int DOT_DUMP_NUM = 0;
+
+    char filename[MAX_FILENAME_LENGTH] = {};
+
+    sprintf(filename, "result_%d", DOT_DUMP_NUM);
+
+    char command0[MAX_COMMAND_LENGTH] = {};
+
+    sprintf(command0, "log/dot/%s.dot", filename);
+
+    myOpen(command0, "w", graphFile);
 
     dumpGraph(graphFile, "  digraph\n"
                          "  {\n"
@@ -299,6 +312,14 @@ ErrorCode DumpListGraph(List* list)
     dumpGraph(graphFile, "  }\n");
 
     myClose(graphFile);
+
+    char command1[MAX_COMMAND_LENGTH] = {};
+
+    sprintf(command1, "dot -Tpng %s -o log/img/%s.png", command0, filename);
+
+    system(command1);
+
+    DOT_DUMP_NUM++;
 
     return OK;
 }

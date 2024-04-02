@@ -21,11 +21,8 @@ $(TARGET) : $(OBJ)
 $(PREF_OBJ)%.o : $(PREF_SRC)%.cpp
 	$(CC) $(HEADERS) $(CFLAGS) -c $^ -o $@
 
-draw:
-	dot -Tpng GraphDump.dot -o tree.png
-
 dirs:
-	mkdir obj log log/txt log/dot log/img
+	mkdir obj log log/dot log/img
 
 clean :
-	rm $(TARGET) $(PREF_OBJ)*.o log/img/*.png log/dot/*.dot log/txt/*.txt
+	rm $(TARGET) $(PREF_OBJ)*.o log/img/*.png log/dot/*.dot
